@@ -1,0 +1,6 @@
+[package]
+name = "pamcollector"
+version = "0.1.0"
+authors = ["Zhiltsov Dmitriy Andreevich <dmitriy.zhiltsov@lamoda.ru>"]
+
+[dependencies]
