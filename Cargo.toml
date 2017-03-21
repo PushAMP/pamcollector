@@ -1,6 +1,7 @@
 [package]
 name = "pamcollector"
 version = "0.1.0"
-authors = ["Zhiltsov Dmitriy Andreevich <dmitriy.zhiltsov@lamoda.ru>"]
+authors = ["Zhiltsov Dmitriy <dmitriy@pushamp.com>"]
 
 [dependencies]
+clap = "2.21.2"
