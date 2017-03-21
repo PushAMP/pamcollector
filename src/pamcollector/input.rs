@@ -1,12 +1,11 @@
+use std::io::{stderr, Write};
+use std::net::UdpSocket;
+use std::str;
 use std::sync::mpsc::SyncSender;
 
 pub trait Input {
     fn accept(&self, tx: SyncSender<Vec<u8>>);
 }
-
-use std::io::{stderr, Read, Write};
-use std::net::UdpSocket;
-use std::str;
 
 pub struct UdpInput {
     listen: String,
@@ -40,7 +39,6 @@ impl Input for UdpInput {
 }
 
 fn handle_record(line: &[u8], tx: &SyncSender<Vec<u8>>) -> Result<(), &'static str> {
-    println!("{:?}", line);
     match tx.send(line.to_vec()) {
         Err(e) => println!("{}", e),
         Ok(re) => println!("OK{:?}", re),

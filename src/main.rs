@@ -1,7 +1,8 @@
 mod pamcollector;
-use clap::{Arg, App};
 extern crate clap;
+
 use std::io::{stderr, Write};
+use clap::App;
 
 const VERSION: &'static str = "0.0.1";
 
