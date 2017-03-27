@@ -20,4 +20,3 @@ impl Metric {
              format!("'{}'", self.operation.as_ref().unwrap_or(&String::new()))]
     }
 }
-

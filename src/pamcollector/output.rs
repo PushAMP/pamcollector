@@ -62,14 +62,13 @@ impl Output for ConsoleOutput {
     fn start(&self, arx: Arc<Mutex<Receiver<Vec<u8>>>>) {
         let mut res_vec: Vec<Metric> = Vec::new();
         thread::spawn(move || loop {
-                          let bytes = match {
-                                    arx.lock().unwrap().recv()
-                                } {
-                              Ok(line) => line,
-                              Err(_) => return,
-                          };
-                          let _ = output_spawn(&bytes, &mut res_vec);
-                      });
+            let bytes = match {
+                arx.lock().unwrap().recv()
+            } {
+                Ok(line) => line,
+                Err(_) => return,
+            };
+            let _ = output_spawn(&bytes, &mut res_vec);
+        });
     }
 }
-

@@ -21,9 +21,8 @@ impl UdpInput {
 
 impl Input for UdpInput {
     fn accept(&self, tx: SyncSender<Vec<u8>>) {
-        let socket =
-            UdpSocket::bind(&self.listen as &str).expect(&format!("Unable to listen to {}",
-                                                                  self.listen));
+        let socket = UdpSocket::bind(&self.listen as &str)
+            .expect(&format!("Unable to listen to {}", self.listen));
         let tx = tx.clone();
 
         let mut buf = [0; 65527];
@@ -42,11 +41,10 @@ impl Input for UdpInput {
 
 fn handle_record(line: &[u8], tx: &SyncSender<Vec<u8>>) -> Result<(), String> {
     let out = String::from_utf8_lossy(&line);
-    let m: Metric =
-        try!(serde_json::from_str(&out).or(Err("Invalid input, unable to parse as a JSON object")));
-    let rencoded =
-        try!(serde_json::to_vec(&m).or(Err("Invalid input, unable to reencoded JSON to vec")));
+    let m: Metric = try!(serde_json::from_str(&out)
+        .or(Err("Invalid input, unable to parse as a JSON object")));
+    let rencoded = try!(serde_json::to_vec(&m)
+        .or(Err("Invalid input, unable to reencoded JSON to vec")));
     try!(tx.send(rencoded).or(Err("Invalid input, unable to send to tx")));
     Ok(())
 }
-

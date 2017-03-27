@@ -2,7 +2,8 @@ extern crate clap;
 extern crate serde_json;
 extern crate hyper;
 extern crate chrono;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate serde_derive;
 mod pamcollector;
 
 
