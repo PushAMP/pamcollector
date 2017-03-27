@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 
 mod input;
 mod output;
+mod metric;
 
 use self::input::Input;
 use self::output::Output;
