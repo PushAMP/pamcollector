@@ -4,6 +4,8 @@ use std::str;
 use std::sync::mpsc::SyncSender;
 use serde_json;
 use pamcollector::metric::Metric;
+use pamcollector::config::Config;
+
 pub trait Input {
     fn accept(&self, tx: SyncSender<Vec<u8>>);
 }
@@ -13,16 +15,17 @@ pub struct UdpInput {
 }
 
 impl UdpInput {
-    pub fn new() -> UdpInput {
-        let listen = "0.0.0.0:12345".to_owned();
-        UdpInput { listen: listen }
+    pub fn new(config: &Config) -> UdpInput {
+        let listen = config.get_udp_input();
+        UdpInput { listen: listen.to_string() }
     }
 }
 
 impl Input for UdpInput {
     fn accept(&self, tx: SyncSender<Vec<u8>>) {
-        let socket = UdpSocket::bind(&self.listen as &str)
-            .expect(&format!("Unable to listen to {}", self.listen));
+        let socket =
+            UdpSocket::bind(&self.listen as &str).expect(&format!("Unable to listen to {}",
+                                                                  self.listen));
         let tx = tx.clone();
 
         let mut buf = [0; 65527];
@@ -48,3 +51,4 @@ fn handle_record(line: &[u8], tx: &SyncSender<Vec<u8>>) -> Result<(), String> {
     try!(tx.send(rencoded).or(Err("Invalid input, unable to send to tx")));
     Ok(())
 }
+
