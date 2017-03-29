@@ -35,7 +35,6 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
                        operation) VALUES {}",
                       strings);
     let mut res_text = String::new();
-    // let address = ;
     let mut res = client.post(&format!("{}?", conf.get_ch_address()))
         .body(&sql)
         .send()
