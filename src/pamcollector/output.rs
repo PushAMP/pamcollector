@@ -8,7 +8,8 @@ use pamcollector::config::Config;
 use hyper::client::Client;
 use hyper;
 use std::io::Read;
-pub struct ConsoleOutput {
+
+pub struct ClickHouseOutput {
     conf: Config,
 }
 
@@ -16,9 +17,9 @@ pub trait Output {
     fn start(&self, arx: Arc<Mutex<Receiver<Vec<u8>>>>);
 }
 
-impl ConsoleOutput {
-    pub fn new(_config: &Config) -> ConsoleOutput {
-        ConsoleOutput { conf: _config.clone() }
+impl ClickHouseOutput {
+    pub fn new(_config: &Config) -> ClickHouseOutput {
+        ClickHouseOutput { conf: _config.clone() }
     }
 }
 
@@ -62,18 +63,19 @@ fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Re
 }
 
 
-impl Output for ConsoleOutput {
+impl Output for ClickHouseOutput {
     fn start(&self, arx: Arc<Mutex<Receiver<Vec<u8>>>>) {
         let mut res_vec: Vec<Metric> = Vec::new();
         let _conf = self.conf.clone();
         thread::spawn(move || loop {
-            let bytes = match {
-                arx.lock().unwrap().recv()
-            } {
-                Ok(line) => line,
-                Err(_) => return,
-            };
-            let _ = output_spawn(&bytes, &mut res_vec, &_conf);
-        });
+                          let bytes = match {
+                                    arx.lock().unwrap().recv()
+                                } {
+                              Ok(line) => line,
+                              Err(_) => return,
+                          };
+                          let _ = output_spawn(&bytes, &mut res_vec, &_conf);
+                      });
     }
 }
+

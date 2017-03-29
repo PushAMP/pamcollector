@@ -10,7 +10,7 @@ use self::config::Config;
 use self::input::Input;
 use self::output::Output;
 use self::input::UdpInput;
-use self::output::ConsoleOutput;
+use self::output::ClickHouseOutput;
 
 
 pub fn start(config_path: &str) {
@@ -22,7 +22,7 @@ pub fn start(config_path: &str) {
         }
     };
     let input_transport = UdpInput::new(&config);
-    let output_transport = ConsoleOutput::new(&config);
+    let output_transport = ClickHouseOutput::new(&config);
     let queue_size = 10_000_000;
     let (tx, rx): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     let arx = Arc::new(Mutex::new(rx));
