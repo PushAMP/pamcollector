@@ -23,9 +23,8 @@ impl UdpInput {
 
 impl Input for UdpInput {
     fn accept(&self, tx: SyncSender<Vec<u8>>) {
-        let socket =
-            UdpSocket::bind(&self.listen as &str).expect(&format!("Unable to listen to {}",
-                                                                  self.listen));
+        let socket = UdpSocket::bind(&self.listen as &str)
+            .expect(&format!("Unable to listen to {}", self.listen));
         let tx = tx.clone();
 
         let mut buf = [0; 65527];
@@ -51,4 +50,3 @@ fn handle_record(line: &[u8], tx: &SyncSender<Vec<u8>>) -> Result<(), String> {
     try!(tx.send(rencoded).or(Err("Invalid input, unable to send to tx")));
     Ok(())
 }
-

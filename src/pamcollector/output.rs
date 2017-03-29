@@ -67,14 +67,13 @@ impl Output for ConsoleOutput {
         let mut res_vec: Vec<Metric> = Vec::new();
         let _conf = self.conf.clone();
         thread::spawn(move || loop {
-                          let bytes = match {
-                                    arx.lock().unwrap().recv()
-                                } {
-                              Ok(line) => line,
-                              Err(_) => return,
-                          };
-                          let _ = output_spawn(&bytes, &mut res_vec, &_conf);
-                      });
+            let bytes = match {
+                arx.lock().unwrap().recv()
+            } {
+                Ok(line) => line,
+                Err(_) => return,
+            };
+            let _ = output_spawn(&bytes, &mut res_vec, &_conf);
+        });
     }
 }
-
