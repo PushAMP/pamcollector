@@ -5,15 +5,22 @@ use std::io::{Error, ErrorKind};
 use std::convert::AsRef;
 use toml;
 const DEFAULT_UDP_LISTEN: &'static str = "0.0.0.0:12345";
+const DEFAULT_CH_ADDRESS: &'static str = "http://0.0.0.0:8123/";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Config {
     input: Option<Input>,
+    output: Option<Output>,
 }
 
 #[derive(Deserialize, Clone)]
 struct Input {
     udp_listen: Option<String>,
+}
+
+#[derive(Deserialize, Clone)]
+struct Output {
+    ch_address: Option<String>,
 }
 
 impl Config {
@@ -43,6 +50,18 @@ impl Config {
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_UDP_LISTEN)
+            }
+        }
+    }
+
+    pub fn get_ch_address(&self) -> &str {
+        match self.output {
+            None => DEFAULT_CH_ADDRESS,
+            Some(ref output) => {
+                output.ch_address
+                    .as_ref()
+                    .map(AsRef::as_ref)
+                    .unwrap_or(DEFAULT_CH_ADDRESS)
             }
         }
     }

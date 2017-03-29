@@ -1,0 +1,5 @@
+[input]
+udp_listen = "0.0.0.0:6767"
+
+[output]
+ch_address = "http://0.0.0.0:8123/"

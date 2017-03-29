@@ -19,7 +19,7 @@ pub fn start(config_path: &str) {
         Err(e) => {println!("Fail to read config {}. {}", config_path, e.description());::std::process::exit(1)}
     };
     let input_transport = UdpInput::new(&config);
-    let output_transport = ConsoleOutput::new();
+    let output_transport = ConsoleOutput::new(&config);
     let queue_size = 10_000_000;
     let (tx, rx): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     let arx = Arc::new(Mutex::new(rx));
