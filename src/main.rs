@@ -1,3 +1,5 @@
+#![feature(retain_hash_collection)]
+
 extern crate clap;
 extern crate serde_json;
 extern crate hyper;

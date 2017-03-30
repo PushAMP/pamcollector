@@ -33,7 +33,7 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
 
 
     let sql = format!("INSERT INTO timers (metric_name, VALUE, ts, app_name, app_layer, \
-                       operation) VALUES {}",
+                       operation, tags, val_tags) VALUES {}",
                       strings);
     let mut res_text = String::new();
     let mut res = client.post(&format!("{}?", conf.get_ch_address()))
