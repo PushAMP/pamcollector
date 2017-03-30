@@ -1,5 +1,4 @@
-#![feature(retain_hash_collection)]
-
+extern crate serde;
 extern crate clap;
 extern crate serde_json;
 extern crate hyper;

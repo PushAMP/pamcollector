@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use chrono::prelude::NaiveDateTime;
+use serde::ser::SerializeMap;
+use serde;
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Metric {
@@ -9,9 +11,31 @@ pub struct Metric {
     value: f32,
     operation: Option<String>,
     metric_name: String,
+    #[serde(serialize_with="serialize_labels")]
     labels: Option<HashMap<String, String>>,
 }
 
+pub fn serialize_labels<S: serde::Serializer>(labels: &Option<HashMap<String, String>>,
+                                              serializer: S)
+                                              -> Result<S::Ok, S::Error> {
+    let ignore_labels =
+        ["app_name", "app_layer", "value", "operation", "metric_name", "labels", "ts"];
+    match labels.as_ref() {
+        Some(labels) => {
+            let mut map = serializer.serialize_map(Some(labels.len()))?;
+            for (label, value) in labels {
+                if !ignore_labels.contains(&label.as_str()) {
+                    map.serialize_entry(&label, &value)?;
+                }
+            }
+            map.end()
+        }
+        None => {
+            let map = serializer.serialize_map(None)?;
+            map.end()
+        }
+    }
+}
 
 impl Metric {
     pub fn to_val(&self) -> Vec<String> {
@@ -50,15 +74,6 @@ impl Metric {
              format!("'{}'", self.operation.as_ref().unwrap_or(&String::new())),
              format!("{}", labels_str),
              format!("{}", labels_var_str)]
-    }
-
-    pub fn clean_labels(&mut self) {
-        let ignore_labels =
-            vec!["app_name", "app_layer", "value", "operation", "metric_name", "labels", "ts"];
-        match self.labels.as_mut() {
-            Some(v) => v.retain(|ref k, _| !ignore_labels.contains(&k.as_str())),
-            None => (),
-        };
     }
 }
 

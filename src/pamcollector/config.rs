@@ -25,9 +25,9 @@ struct Output {
 
 impl Config {
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Config, Error> {
-        let mut fd = try!(File::open(path));
+        let mut fd = File::open(path)?;
         let mut toml_str = String::new();
-        try!(fd.read_to_string(&mut toml_str));
+        fd.read_to_string(&mut toml_str)?;
         Config::from_string(&toml_str)
     }
 
@@ -46,7 +46,8 @@ impl Config {
         match self.input {
             None => DEFAULT_UDP_LISTEN,
             Some(ref input) => {
-                input.udp_listen
+                input
+                    .udp_listen
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_UDP_LISTEN)
@@ -58,7 +59,8 @@ impl Config {
         match self.output {
             None => DEFAULT_CH_ADDRESS,
             Some(ref output) => {
-                output.ch_address
+                output
+                    .ch_address
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_CH_ADDRESS)
@@ -66,3 +68,4 @@ impl Config {
         }
     }
 }
+

@@ -24,11 +24,11 @@ impl ClickHouseOutput {
 }
 
 fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
-    let strings = res_vec.iter()
-                 .map(|x| format!("({})", x.to_val().join(", ")))
-                //  .join(", ")
-                 .collect::<Vec<_>>().join(", ");
-    //  .concat();
+    let strings = res_vec
+        .iter()
+        .map(|x| format!("({})", x.to_val().join(", ")))
+        .collect::<Vec<_>>()
+        .join(", ");
     let client = Client::new();
 
 
@@ -36,7 +36,8 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
                        operation, tags, val_tags) VALUES {}",
                       strings);
     let mut res_text = String::new();
-    let mut res = client.post(&format!("{}?", conf.get_ch_address()))
+    let mut res = client
+        .post(&format!("{}?", conf.get_ch_address()))
         .body(&sql)
         .send()
         .unwrap();
@@ -51,8 +52,8 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
 
 fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Result<(), String> {
     let out = String::from_utf8_lossy(&bytes);
-    let m: Metric = try!(serde_json::from_str(&out)
-        .or(Err("Invalid input, unable to parse as a JSON object")));
+    let m: Metric =
+        serde_json::from_str(&out).or(Err("Invalid input, unable to parse as a JSON object"))?;
     res_vec.push(m);
     if res_vec.len() > 2 {
         println!("FULL");
