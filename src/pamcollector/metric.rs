@@ -30,12 +30,14 @@ impl Metric {
             None => (Vec::new(), Vec::new()),
         };
         let labels_str = format!("[{}]",
-                                 labels.iter()
+                                 labels
+                                     .iter()
                                      .map(|x| format!("'{}'", x))
                                      .collect::<Vec<_>>()
                                      .join(", "));
         let labels_var_str = format!("[{}]",
-                                     labels_val.iter()
+                                     labels_val
+                                         .iter()
                                          .map(|x| format!("'{}'", x))
                                          .collect::<Vec<_>>()
                                          .join(", "));
@@ -51,7 +53,8 @@ impl Metric {
     }
 
     pub fn clean_labels(&mut self) {
-        let ignore_labels = vec!["app_name", "app_layer", "value", "operation", "metric_name"];
+        let ignore_labels =
+            vec!["app_name", "app_layer", "value", "operation", "metric_name", "labels", "ts"];
         match self.labels.as_mut() {
             Some(v) => v.retain(|ref k, _| !ignore_labels.contains(&k.as_str())),
             None => (),
