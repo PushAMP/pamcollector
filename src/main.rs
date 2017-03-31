@@ -11,7 +11,7 @@ mod pamcollector;
 use std::io::{stderr, Write};
 use clap::{App, Arg};
 
-const VERSION: &'static str = "0.0.1";
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const DEFAULT_CONF_FILE: &'static str = "pamcollector.toml";
 
 

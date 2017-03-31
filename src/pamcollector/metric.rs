@@ -3,6 +3,7 @@ use chrono::prelude::NaiveDateTime;
 use serde::ser::SerializeMap;
 use serde;
 
+
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Metric {
     ts: u64,
