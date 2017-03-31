@@ -25,9 +25,8 @@ impl UdpInput {
 
 impl Input for UdpInput {
     fn accept(&self, tx: SyncSender<Vec<u8>>) {
-        let socket =
-            UdpSocket::bind(&self.listen as &str).expect(&format!("Unable to listen to {}",
-                                                                  self.listen));
+        let socket = UdpSocket::bind(&self.listen as &str)
+            .expect(&format!("Unable to listen to {}", self.listen));
         let tx = tx.clone();
 
         let mut buf = [0; 65527];
@@ -75,29 +74,30 @@ fn handle_client(client: TcpStream, tx: SyncSender<Vec<u8>>) {
         println!("Connection over TCP from [{}]", peer_addr);
     }
     let buf_reader = BufReader::new(client);
-            for line in buf_reader.lines() {
-            let line = match line {
-                Ok(line) => line,
-                Err(e) => {
-                    match e.kind() {
-                        ErrorKind::Interrupted => continue,
-                        ErrorKind::InvalidInput | ErrorKind::InvalidData => {
-                            let _ = writeln!(stderr(), "Invalid UTF-8 input");
-                            continue;
-                        }
-                        ErrorKind::WouldBlock => {
-                            let _ = writeln!(stderr(),
-                                             "Client hasn't sent any data for a while - Closing idle connection");
-                            return;
-                        }
-                        _ => return,
+    for line in buf_reader.lines() {
+        let line = match line {
+            Ok(line) => line,
+            Err(e) => {
+                match e.kind() {
+                    ErrorKind::Interrupted => continue,
+                    ErrorKind::InvalidInput | ErrorKind::InvalidData => {
+                        let _ = writeln!(stderr(), "Invalid UTF-8 input");
+                        continue;
                     }
+                    ErrorKind::WouldBlock => {
+                        let _ = writeln!(stderr(),
+                                         "Client hasn't sent any data for a while - Closing idle \
+                                          connection");
+                        return;
+                    }
+                    _ => return,
                 }
-            };
-            if let Err(e) = handle_record(&line, &tx) {
-                let _ = writeln!(stderr(), "{}: [{}]", e, line.trim());
             }
+        };
+        if let Err(e) = handle_record(&line, &tx) {
+            let _ = writeln!(stderr(), "{}: [{}]", e, line.trim());
         }
+    }
 }
 
 fn handle_record(line: &String, tx: &SyncSender<Vec<u8>>) -> Result<(), String> {
@@ -109,4 +109,3 @@ fn handle_record(line: &String, tx: &SyncSender<Vec<u8>>) -> Result<(), String> 
         .or(Err("Invalid input, unable to send to tx"))?;
     Ok(())
 }
-

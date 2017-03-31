@@ -55,14 +55,12 @@ impl Metric {
             None => (Vec::new(), Vec::new()),
         };
         let labels_str = format!("[{}]",
-                                 labels
-                                     .iter()
+                                 labels.iter()
                                      .map(|x| format!("'{}'", x))
                                      .collect::<Vec<_>>()
                                      .join(", "));
         let labels_var_str = format!("[{}]",
-                                     labels_val
-                                         .iter()
+                                     labels_val.iter()
                                          .map(|x| format!("'{}'", x))
                                          .collect::<Vec<_>>()
                                          .join(", "));
@@ -77,4 +75,3 @@ impl Metric {
              format!("{}", labels_var_str)]
     }
 }
-

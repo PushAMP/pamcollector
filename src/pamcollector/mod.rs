@@ -31,8 +31,8 @@ pub fn start(config_path: &str) {
     let (tx2, rx2): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     let arx2 = Arc::new(Mutex::new(rx2));
     output_transport1.start(arx2);
-        thread::spawn(move || { input_tcp.accept(tx2); });
-        let (tx1, rx1): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
+    thread::spawn(move || { input_tcp.accept(tx2); });
+    let (tx1, rx1): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     let arx1 = Arc::new(Mutex::new(rx1));
     output_transport.start(arx1);
     input_udp.accept(tx1);
