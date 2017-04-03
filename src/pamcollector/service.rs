@@ -3,8 +3,10 @@ use futures::{future, Future, BoxFuture};
 use std::sync::mpsc::{SyncSender, Sender};
 use std::sync::{Arc, Mutex};
 use serde_json;
+use futures::sync::mpsc;
+use futures::Sink;
 pub struct Echo {
-    pub tx: Arc<Mutex<Sender<Vec<u8>>>>,
+    pub tx: mpsc::Sender<Vec<u8>>,
 }
 use std::io;
 use pamcollector::metric::Metric;
@@ -21,7 +23,8 @@ impl Service for Echo {
     fn call(&self, req: Self::Request) -> Self::Future {
         // let rev: String = req.chars().rev().collect();
         let rencoded = serde_json::to_vec(&req).unwrap();
-        self.tx.lock().unwrap().send(rencoded);
+        let tx = self.tx.clone();
+        tx.send(rencoded);
         future::ok(format!("OK")).boxed()
     }
 }

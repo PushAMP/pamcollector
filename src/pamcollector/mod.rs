@@ -19,7 +19,7 @@ use self::codec::LineCodec;
 use self::protocol::LineProto;
 use self::service::Echo;
 use tokio_proto::TcpServer;
-
+use futures::sync::mpsc;
 
 pub fn start(config_path: &str) {
     let config = match Config::from_path(&config_path) {
@@ -33,14 +33,15 @@ pub fn start(config_path: &str) {
     // let input_tcp = TcpInput::new(&config);
     let output_transport = ClickHouseOutput::new(&config);
     // let output_transport1 = ClickHouseOutput::new(&config);
-    // let queue_size = 10_000_000;
+    let queue_size = 10_000_000;
     let addr = "0.0.0.0:12345".parse().unwrap();
     let server = TcpServer::new(LineProto, addr);
     let (tx, rx): (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel();
     let atx = Arc::new(Mutex::new(tx));
     let arx = Arc::new(Mutex::new(rx));
+    let (ftx, frx): (mpsc::Sender<Vec<u8>>, mpsc::Receiver<Vec<u8>>) = mpsc::channel(queue_size);
     output_transport.start(arx);
-    server.serve(move || Ok(Echo {tx: atx.clone()}));
+    server.serve(move || Ok(Echo {tx: ftx.clone()}));
     // let (tx2, rx2): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     
     // thread::spawn(move || { input_tcp.accept(tx2); });
