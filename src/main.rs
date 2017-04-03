@@ -4,6 +4,11 @@ extern crate serde_json;
 extern crate hyper;
 extern crate chrono;
 extern crate toml;
+extern crate bytes;
+extern crate futures;
+extern crate tokio_io;
+extern crate tokio_proto;
+extern crate tokio_service;
 #[macro_use]
 extern crate serde_derive;
 mod pamcollector;
