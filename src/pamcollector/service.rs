@@ -1,15 +1,13 @@
 use tokio_service::Service;
 use futures::{future, Future, BoxFuture};
-use std::sync::mpsc::{SyncSender, Sender};
+use std::sync::mpsc::SyncSender;
 use std::sync::{Arc, Mutex};
 use serde_json;
-use futures::sync::mpsc;
-use futures::Sink;
-pub struct Echo {
-    pub tx: mpsc::Sender<Vec<u8>>,
-}
-use std::io;
 use pamcollector::metric::Metric;
+use std::io;
+pub struct Echo {
+    pub tx: Arc<Mutex<SyncSender<Vec<u8>>>>,
+}
 
 impl Service for Echo {
     // These types must match the corresponding protocol types:
@@ -23,8 +21,7 @@ impl Service for Echo {
     fn call(&self, req: Self::Request) -> Self::Future {
         // let rev: String = req.chars().rev().collect();
         let rencoded = serde_json::to_vec(&req).unwrap();
-        let tx = self.tx.clone();
-        tx.send(rencoded);
+        self.tx.lock().unwrap().try_send(rencoded);
         future::ok(format!("OK")).boxed()
     }
 }

@@ -12,7 +12,7 @@ extern crate tokio_service;
 #[macro_use]
 extern crate serde_derive;
 mod pamcollector;
-
+extern crate tokio_core;
 use std::io::{stderr, Write};
 use clap::{App, Arg};
 

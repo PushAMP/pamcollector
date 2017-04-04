@@ -1,6 +1,6 @@
 use std::io;
 use std::str;
-use bytes::{BytesMut, BufMut};
+use bytes::BytesMut;
 use tokio_io::codec::{Encoder, Decoder};
 use pamcollector::metric::Metric;
 use serde_json;
