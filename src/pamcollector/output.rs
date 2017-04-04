@@ -8,13 +8,14 @@ use pamcollector::config::Config;
 use hyper::client::Client;
 use hyper;
 use std::io::Read;
-
+use futures::sync::mpsc;
+use futures::Stream;
 pub struct ClickHouseOutput {
     conf: Config,
 }
 
 pub trait Output {
-    fn start(&self, arx: Arc<Mutex<Receiver<Vec<u8>>>>);
+    fn start(&self, arx: &mut mpsc::Receiver<Vec<u8>>);
 }
 
 impl ClickHouseOutput {
@@ -65,19 +66,17 @@ fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Re
 
 
 impl Output for ClickHouseOutput {
-    fn start(&self, arx: Arc<Mutex<Receiver<Vec<u8>>>>) {
+    fn start(&self, arx: &mut mpsc::Receiver<Vec<u8>>) {
         println!("DDD");
         let mut res_vec: Vec<Metric> = Vec::new();
         let _conf = self.conf.clone();
-        thread::spawn(move || loop {
-                          let bytes = match {
-                                    arx.lock().unwrap().recv()
-                                } {
-                              Ok(line) => line,
-                              Err(_) => return,
-                          };
-                          let _ = output_spawn(&bytes, &mut res_vec, &_conf);
-                      });
+        let mut d = arx.wait();
+        println!("{:?}", d.next());
+        // thread::spawn(move |arx| loop {
+        //   let rx = arx.map(|x| x);
+
+        //   let _ = output_spawn(&bytes, &mut res_vec, &_conf);
+        //   });
     }
 }
 
