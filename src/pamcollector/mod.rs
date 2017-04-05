@@ -19,7 +19,7 @@ pub fn start(config_path: &str) {
     let config = match Config::from_path(&config_path) {
         Ok(config) => config,
         Err(e) => {
-            println!("Fail to read config {}. {}", config_path, e.description());
+            error!("Fail to read config {}. {}", config_path, e.description());
             ::std::process::exit(1)
         }
     };
@@ -37,9 +37,9 @@ pub fn start(config_path: &str) {
     output_transport.start(arx);
     // server.with_handle(output_transport.start(frx));
 
-    server.serve(move || Ok(Echo {tx: atx.clone()}));
+    server.serve(move || Ok(Echo { tx: atx.clone() }));
     // let (tx2, rx2): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
-    
+
     // thread::spawn(move || { input_tcp.accept(tx2); });
     // let (tx1, rx1): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     // let arx1 = Arc::new(Mutex::new(rx1));

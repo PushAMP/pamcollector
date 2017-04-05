@@ -49,22 +49,24 @@ impl Metric {
                     vec2.push(v);
 
                 }
-                println!("{:?} {:?}", vec1, vec2);
+                info!("{:?} {:?}", vec1, vec2);
                 (vec1, vec2)
             }
             None => (Vec::new(), Vec::new()),
         };
         let labels_str = format!("[{}]",
-                                 labels.iter()
+                                 labels
+                                     .iter()
                                      .map(|x| format!("'{}'", x))
                                      .collect::<Vec<_>>()
                                      .join(", "));
         let labels_var_str = format!("[{}]",
-                                     labels_val.iter()
+                                     labels_val
+                                         .iter()
                                          .map(|x| format!("'{}'", x))
                                          .collect::<Vec<_>>()
                                          .join(", "));
-        println!("{}, {}", labels_str, labels_var_str);
+        info!("{}, {}", labels_str, labels_var_str);
         vec![format!("'{}'", self.metric_name),
              format!("{}", self.value),
              format!("'{}'", NaiveDateTime::from_timestamp(self.ts as i64, 0)),
@@ -75,3 +77,4 @@ impl Metric {
              format!("{}", labels_var_str)]
     }
 }
+

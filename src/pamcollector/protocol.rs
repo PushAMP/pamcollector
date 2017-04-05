@@ -23,4 +23,3 @@ impl<T: AsyncRead + AsyncWrite + 'static> ServerProto<T> for LineProto {
         Ok(io.framed(LineCodec))
     }
 }
-

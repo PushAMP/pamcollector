@@ -47,4 +47,3 @@ impl Encoder for LineCodec {
         Ok(())
     }
 }
-

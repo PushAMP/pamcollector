@@ -25,4 +25,3 @@ impl Service for Echo {
         future::ok(format!("OK")).boxed()
     }
 }
-

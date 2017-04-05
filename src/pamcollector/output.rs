@@ -4,7 +4,8 @@ use std::thread;
 use serde_json;
 use pamcollector::metric::Metric;
 use pamcollector::config::Config;
-
+#[macro_use]
+use log;
 use hyper::client::Client;
 use hyper;
 use std::io::Read;
@@ -43,10 +44,10 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
         .unwrap();
     res.read_to_string(&mut res_text).unwrap();
     if hyper::Ok != res.status {
-        println!("Failed push to CH {}", res_text);
+        warn!("Failed push to CH {}", res_text);
     };
 
-    println!("{}", res_text);
+    info!("Resp fronm CH {}", res_text);
     sql
 }
 
@@ -56,8 +57,8 @@ fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Re
         serde_json::from_str(&out).or(Err("Invalid input, unable to parse as a JSON object"))?;
     res_vec.push(m);
     if res_vec.len() > 2 {
-        println!("FULL");
-        println!("{}", to_ch_sql(&res_vec, &conf));
+        info!("FULL");
+        info!("{}", to_ch_sql(&res_vec, &conf));
         res_vec.clear();
     };
     Ok(())
