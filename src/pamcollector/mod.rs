@@ -23,12 +23,9 @@ pub fn start(config_path: &str) {
             ::std::process::exit(1)
         }
     };
-    // let input_udp = UdpInput::new(&config);
-    // let input_tcp = TcpInput::new(&config);
     let output_transport = ClickHouseOutput::new(&config);
-    // let output_transport1 = ClickHouseOutput::new(&config);
     let queue_size = 10_000_000;
-    let addr = "0.0.0.0:12345".parse().unwrap();
+    let addr = config.get_tcp_input().parse().unwrap();
     let server = TcpServer::new(LineProto, addr);
     let (tx, rx): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     let atx = Arc::new(Mutex::new(tx));

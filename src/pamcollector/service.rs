@@ -21,7 +21,7 @@ impl Service for Echo {
     fn call(&self, req: Self::Request) -> Self::Future {
         // let rev: String = req.chars().rev().collect();
         let rencoded = serde_json::to_vec(&req).unwrap();
-        self.tx.lock().unwrap().try_send(rencoded);
+        let _ = self.tx.lock().unwrap().try_send(rencoded);
         future::ok(format!("OK")).boxed()
     }
 }

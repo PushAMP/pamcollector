@@ -4,7 +4,7 @@ use std::path::Path;
 use std::io::{Error, ErrorKind};
 use std::convert::AsRef;
 use toml;
-const DEFAULT_UDP_LISTEN: &'static str = "0.0.0.0:12345";
+
 const DEFAULT_TCP_LISTEN: &'static str = "0.0.0.0:9091";
 
 const DEFAULT_CH_ADDRESS: &'static str = "http://0.0.0.0:8123/";
@@ -45,24 +45,11 @@ impl Config {
         Ok(config)
     }
 
-    pub fn get_udp_input(&self) -> &str {
-        match self.input {
-            None => DEFAULT_UDP_LISTEN,
-            Some(ref input) => {
-                input
-                    .udp_listen
-                    .as_ref()
-                    .map(AsRef::as_ref)
-                    .unwrap_or(DEFAULT_UDP_LISTEN)
-            }
-        }
-    }
     pub fn get_tcp_input(&self) -> &str {
         match self.input {
-            None => DEFAULT_UDP_LISTEN,
+            None => DEFAULT_TCP_LISTEN,
             Some(ref input) => {
-                input
-                    .udp_listen
+                input.udp_listen
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_TCP_LISTEN)
@@ -74,8 +61,7 @@ impl Config {
         match self.output {
             None => DEFAULT_CH_ADDRESS,
             Some(ref output) => {
-                output
-                    .ch_address
+                output.ch_address
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_CH_ADDRESS)
@@ -83,4 +69,3 @@ impl Config {
         }
     }
 }
-
