@@ -19,7 +19,7 @@ extern crate serde_derive;
 use clap::{App, Arg};
 use log::LogLevelFilter;
 use log4rs::append::console::ConsoleAppender;
-use log4rs::config::{Appender, Config, Logger, Root};
+use log4rs::config::{Appender, Config, Root};
 mod pamcollector;
 
 
@@ -30,7 +30,6 @@ fn main() {
     let stdout = ConsoleAppender::builder().build();
     let log_config = Config::builder()
         .appender(Appender::builder().build("stdout", Box::new(stdout)))
-        .logger(Logger::builder().build("app::backend::db", LogLevelFilter::Info))
         .build(Root::builder().appender("stdout").build(LogLevelFilter::Info))
         .unwrap();
 
