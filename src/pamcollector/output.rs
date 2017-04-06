@@ -54,8 +54,8 @@ fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Re
     let m: Metric =
         serde_json::from_str(&out).or(Err("Invalid input, unable to parse as a JSON object"))?;
     res_vec.push(m);
-    if res_vec.len() > 2 {
-        info!("FULL");
+    if res_vec.len() > conf.get_output_queue_size() as usize {
+        warn!("FULL");
         info!("{}", to_ch_sql(&res_vec, &conf));
         res_vec.clear();
     };

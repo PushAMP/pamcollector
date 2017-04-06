@@ -8,6 +8,7 @@ use toml;
 const DEFAULT_TCP_LISTEN: &'static str = "0.0.0.0:9091";
 const DEFAULT_QUEUE_SIZE: usize = 20_000;
 const DEFAULT_CH_ADDRESS: &'static str = "http://0.0.0.0:8123/";
+const DEFAULT_OUT_QUEUE_SIZE: u16 = 100;
 
 #[derive(Deserialize, Clone)]
 pub struct Config {
@@ -25,6 +26,7 @@ struct Input {
 #[derive(Deserialize, Clone)]
 struct Output {
     ch_address: Option<String>,
+    queue_size: Option<u16>,
 }
 
 impl Config {
@@ -76,6 +78,12 @@ impl Config {
         match self.input {
             Some(ref input) => input.queue_size.unwrap_or(DEFAULT_QUEUE_SIZE),
             None => DEFAULT_QUEUE_SIZE,
+        }
+    }
+    pub fn get_output_queue_size(&self) -> u16 {
+        match self.output {
+            Some(ref output) => output.queue_size.unwrap_or(DEFAULT_OUT_QUEUE_SIZE),
+            None => DEFAULT_OUT_QUEUE_SIZE,
         }
     }
 }
