@@ -1,5 +1,6 @@
 [input]
-udp_listen = "0.0.0.0:6767"
+tcp_listen = "0.0.0.0:6767"
+queue_size = 10_000_000
 
 [output]
 ch_address = "http://0.0.0.0:8123/"
