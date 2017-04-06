@@ -12,7 +12,7 @@ use self::config::Config;
 use self::output::Output;
 use self::output::ClickHouseOutput;
 use self::protocol::LineProto;
-use self::service::Echo;
+use self::service::MetricInputService;
 use tokio_proto::TcpServer;
 
 pub fn start(config_path: &str) {
@@ -24,22 +24,18 @@ pub fn start(config_path: &str) {
         }
     };
     let output_transport = ClickHouseOutput::new(&config);
-    let queue_size = 10_000_000;
-    let addr = config.get_tcp_input().parse().unwrap();
+    let queue_size = config.get_queue_size();
+    let addr = match config.get_tcp_input().parse() {
+        Ok(addr) => addr,
+        Err(e) => {
+            error!("Fail to parse tcp input address {}. {:?}", config.get_tcp_input(), e);
+            ::std::process::exit(1)
+        }
+    };
     let server = TcpServer::new(LineProto, addr);
     let (tx, rx): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
     let atx = Arc::new(Mutex::new(tx));
     let arx = Arc::new(Mutex::new(rx));
-    // let (ftx1, frx): (mpsc::Sender<Vec<u8>>, mpsc::Receiver<Vec<u8>>) = mpsc::channel(1);
     output_transport.start(arx);
-    // server.with_handle(output_transport.start(frx));
-
-    server.serve(move || Ok(Echo { tx: atx.clone() }));
-    // let (tx2, rx2): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
-
-    // thread::spawn(move || { input_tcp.accept(tx2); });
-    // let (tx1, rx1): (SyncSender<Vec<u8>>, Receiver<Vec<u8>>) = sync_channel(queue_size);
-    // let arx1 = Arc::new(Mutex::new(rx1));
-    // output_transport.start(arx1);
-    // input_udp.accept(tx1);
+    server.serve(move || Ok(MetricInputService { tx: atx.clone() }));
 }

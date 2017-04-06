@@ -5,11 +5,11 @@ use std::sync::{Arc, Mutex};
 use serde_json;
 use pamcollector::metric::Metric;
 use std::io;
-pub struct Echo {
+pub struct MetricInputService {
     pub tx: Arc<Mutex<SyncSender<Vec<u8>>>>,
 }
 
-impl Service for Echo {
+impl Service for MetricInputService {
     // These types must match the corresponding protocol types:
     type Request = Metric;
     type Response = String;
@@ -19,9 +19,9 @@ impl Service for Echo {
     type Future = BoxFuture<Self::Response, Self::Error>;
     // Produce a future for computing a response from a request.
     fn call(&self, req: Self::Request) -> Self::Future {
-        // let rev: String = req.chars().rev().collect();
         let rencoded = serde_json::to_vec(&req).unwrap();
         let _ = self.tx.lock().unwrap().try_send(rencoded);
         future::ok(format!("OK")).boxed()
     }
 }
+

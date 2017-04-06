@@ -6,7 +6,7 @@ use std::convert::AsRef;
 use toml;
 
 const DEFAULT_TCP_LISTEN: &'static str = "0.0.0.0:9091";
-
+const DEFAULT_QUEUE_SIZE: usize = 20_000;
 const DEFAULT_CH_ADDRESS: &'static str = "http://0.0.0.0:8123/";
 
 #[derive(Deserialize, Clone)]
@@ -19,6 +19,7 @@ pub struct Config {
 struct Input {
     udp_listen: Option<String>,
     tcp_input: Option<String>,
+    queue_size: Option<usize>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -49,7 +50,8 @@ impl Config {
         match self.input {
             None => DEFAULT_TCP_LISTEN,
             Some(ref input) => {
-                input.udp_listen
+                input
+                    .tcp_input
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_TCP_LISTEN)
@@ -61,11 +63,20 @@ impl Config {
         match self.output {
             None => DEFAULT_CH_ADDRESS,
             Some(ref output) => {
-                output.ch_address
+                output
+                    .ch_address
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_CH_ADDRESS)
             }
         }
     }
+
+    pub fn get_queue_size(&self) -> usize {
+        match self.input {
+            Some(ref input) => input.queue_size.unwrap_or(DEFAULT_QUEUE_SIZE),
+            None => DEFAULT_QUEUE_SIZE,
+        }
+    }
 }
+
