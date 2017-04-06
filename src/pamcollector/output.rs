@@ -4,8 +4,6 @@ use std::thread;
 use serde_json;
 use pamcollector::metric::Metric;
 use pamcollector::config::Config;
-// #[macro_use]
-// use log;
 use hyper::client::Client;
 use hyper;
 use std::io::Read;
@@ -25,7 +23,8 @@ impl ClickHouseOutput {
 }
 
 fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
-    let strings = res_vec.iter()
+    let strings = res_vec
+        .iter()
         .map(|x| format!("({})", x.to_val().join(", ")))
         .collect::<Vec<_>>()
         .join(", ");
@@ -36,7 +35,8 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
                        operation, tags, val_tags) VALUES {}",
                       strings);
     let mut res_text = String::new();
-    let mut res = client.post(&format!("{}?", conf.get_ch_address()))
+    let mut res = client
+        .post(&format!("{}?", conf.get_ch_address()))
         .body(&sql)
         .send()
         .unwrap();
@@ -67,11 +67,12 @@ impl Output for ClickHouseOutput {
         let mut res_vec: Vec<Metric> = Vec::new();
         let _conf = self.conf.clone();
         thread::spawn(move || loop {
-            let bytes = match arx.lock().unwrap().recv() {
-                Ok(line) => line,
-                Err(_) => return,
-            };
-            let _ = output_spawn(&bytes, &mut res_vec, &_conf);
-        });
+                          let bytes = match arx.lock().unwrap().recv() {
+                              Ok(line) => line,
+                              Err(_) => return,
+                          };
+                          let _ = output_spawn(&bytes, &mut res_vec, &_conf);
+                      });
     }
 }
+
