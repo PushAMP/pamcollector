@@ -18,7 +18,7 @@ pub struct Config {
 #[derive(Deserialize, Clone)]
 struct Input {
     udp_listen: Option<String>,
-    tcp_input: Option<String>,
+    tcp_listen: Option<String>,
     queue_size: Option<usize>,
 }
 
@@ -51,7 +51,7 @@ impl Config {
             None => DEFAULT_TCP_LISTEN,
             Some(ref input) => {
                 input
-                    .tcp_input
+                    .tcp_listen
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_TCP_LISTEN)
