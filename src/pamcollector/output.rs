@@ -56,7 +56,7 @@ fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Re
     res_vec.push(m);
     if res_vec.len() > conf.get_output_queue_size() as usize {
         warn!("FULL");
-        info!("{}", to_ch_sql(&res_vec, &conf));
+        debug!("{}", to_ch_sql(&res_vec, &conf));
         res_vec.clear();
     };
     Ok(())

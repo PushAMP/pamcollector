@@ -1,9 +1,8 @@
 use std::io;
-use std::str;
 use bytes::BytesMut;
 use tokio_io::codec::{Encoder, Decoder};
 use pamcollector::metric::Metric;
-use serde_json;
+use serde_cbor;
 
 pub struct LineCodec;
 
@@ -17,18 +16,13 @@ impl Decoder for LineCodec {
             let line = buf.split_to(i);
             // Also remove the '\n'
             buf.split_to(1);
-            match str::from_utf8(&line) {
-                Ok(s) => {
-                    let met = serde_json::from_str(s);
-                    match met {
-                        Ok(metric) => Ok(Some(metric)),
-                        Err(_) => {
-                            Err(io::Error::new(io::ErrorKind::Other,
-                                               "Invalid input, unable to parse as a JSON object"))
-                        }
-                    }
+            let metric: Result<Metric, _> = serde_cbor::from_slice(&line);
+            match metric {
+                Ok(me) => Ok(Some(me)),
+                Err(_) => {
+                    Err(io::Error::new(io::ErrorKind::Other,
+                                       "Invalid input, unable to parse as a JSON object"))
                 }
-                Err(_) => Err(io::Error::new(io::ErrorKind::Other, "invalid UTF-8")),
             }
         } else {
             Ok(None)
@@ -47,3 +41,4 @@ impl Encoder for LineCodec {
         Ok(())
     }
 }
+
