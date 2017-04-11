@@ -2,7 +2,6 @@ use tokio_service::Service;
 use futures::{future, Future, BoxFuture};
 use std::sync::mpsc::SyncSender;
 use std::sync::{Arc, Mutex};
-use serde_json;
 use pamcollector::metric::Metric;
 use std::io;
 pub struct MetricInputService {
@@ -19,9 +18,10 @@ impl Service for MetricInputService {
     type Future = BoxFuture<Self::Response, Self::Error>;
     // Produce a future for computing a response from a request.
     fn call(&self, req: Self::Request) -> Self::Future {
-        let rencoded = serde_json::to_vec(&req).unwrap();
-        let _ = self.tx.lock().unwrap().try_send(rencoded);
-        future::ok(format!("OK")).boxed()
+        let _ = self.tx
+            .lock()
+            .unwrap()
+            .try_send(req.to_val().join(", ").into_bytes());
+        future::ok(format!("")).boxed()
     }
 }
-

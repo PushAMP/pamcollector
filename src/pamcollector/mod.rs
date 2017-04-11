@@ -28,7 +28,9 @@ pub fn start(config_path: &str) {
     let addr = match config.get_tcp_input().parse() {
         Ok(addr) => addr,
         Err(e) => {
-            error!("Fail to parse tcp input address {}. {:?}", config.get_tcp_input(), e);
+            error!("Fail to parse tcp input address {}. {:?}",
+                   config.get_tcp_input(),
+                   e);
             ::std::process::exit(1)
         }
     };

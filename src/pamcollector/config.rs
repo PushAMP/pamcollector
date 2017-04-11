@@ -52,8 +52,7 @@ impl Config {
         match self.input {
             None => DEFAULT_TCP_LISTEN,
             Some(ref input) => {
-                input
-                    .tcp_listen
+                input.tcp_listen
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_TCP_LISTEN)
@@ -65,8 +64,7 @@ impl Config {
         match self.output {
             None => DEFAULT_CH_ADDRESS,
             Some(ref output) => {
-                output
-                    .ch_address
+                output.ch_address
                     .as_ref()
                     .map(AsRef::as_ref)
                     .unwrap_or(DEFAULT_CH_ADDRESS)
@@ -87,4 +85,3 @@ impl Config {
         }
     }
 }
-

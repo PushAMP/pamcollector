@@ -1,6 +1,6 @@
 extern crate serde;
 extern crate clap;
-extern crate serde_json;
+extern crate serde_cbor;
 extern crate hyper;
 extern crate chrono;
 extern crate toml;

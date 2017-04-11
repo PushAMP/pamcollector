@@ -1,8 +1,6 @@
 use std::sync::mpsc::Receiver;
 use std::sync::{Arc, Mutex};
 use std::thread;
-use serde_json;
-use pamcollector::metric::Metric;
 use pamcollector::config::Config;
 use hyper::client::Client;
 use hyper;
@@ -22,10 +20,9 @@ impl ClickHouseOutput {
     }
 }
 
-fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
-    let strings = res_vec
-        .iter()
-        .map(|x| format!("({})", x.to_val().join(", ")))
+fn to_ch_sql(res_vec: &Vec<String>, conf: &Config) -> String {
+    let strings = res_vec.iter()
+        .map(|x| format!("({})", x))
         .collect::<Vec<_>>()
         .join(", ");
     let client = Client::new();
@@ -35,8 +32,7 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
                        operation, tags, val_tags) VALUES {}",
                       strings);
     let mut res_text = String::new();
-    let mut res = client
-        .post(&format!("{}?", conf.get_ch_address()))
+    let mut res = client.post(&format!("{}?", conf.get_ch_address()))
         .body(&sql)
         .send()
         .unwrap();
@@ -49,11 +45,9 @@ fn to_ch_sql(res_vec: &Vec<Metric>, conf: &Config) -> String {
     sql
 }
 
-fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Result<(), String> {
-    let out = String::from_utf8_lossy(&bytes);
-    let m: Metric =
-        serde_json::from_str(&out).or(Err("Invalid input, unable to parse as a JSON object"))?;
-    res_vec.push(m);
+fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<String>, conf: &Config) -> Result<(), String> {
+    let out: String = String::from_utf8_lossy(&bytes).into_owned();
+    res_vec.push(out);
     if res_vec.len() > conf.get_output_queue_size() as usize {
         warn!("FULL");
         debug!("{}", to_ch_sql(&res_vec, &conf));
@@ -64,15 +58,14 @@ fn output_spawn(bytes: &Vec<u8>, res_vec: &mut Vec<Metric>, conf: &Config) -> Re
 
 impl Output for ClickHouseOutput {
     fn start(&self, arx: Arc<Mutex<Receiver<Vec<u8>>>>) {
-        let mut res_vec: Vec<Metric> = Vec::new();
+        let mut res_vec: Vec<String> = Vec::new();
         let _conf = self.conf.clone();
         thread::spawn(move || loop {
-                          let bytes = match arx.lock().unwrap().recv() {
-                              Ok(line) => line,
-                              Err(_) => return,
-                          };
-                          let _ = output_spawn(&bytes, &mut res_vec, &_conf);
-                      });
+            let bytes = match arx.lock().unwrap().recv() {
+                Ok(line) => line,
+                Err(_) => return,
+            };
+            let _ = output_spawn(&bytes, &mut res_vec, &_conf);
+        });
     }
 }
-
