@@ -30,18 +30,22 @@ fn main() {
     let stdout = ConsoleAppender::builder().build();
     let log_config = Config::builder()
         .appender(Appender::builder().build("stdout", Box::new(stdout)))
-        .build(Root::builder().appender("stdout").build(LogLevelFilter::Info))
+        .build(Root::builder().appender("stdout").build(
+            LogLevelFilter::Info,
+        ))
         .unwrap();
 
     let _ = log4rs::init_config(log_config).unwrap();
     let matches = App::new("PaMCollector")
         .version(VERSION)
         .about("PushAMP Metric Collector")
-        .arg(Arg::with_name("config_file")
-            .short("c")
-            .long("config")
-            .help("Configuration file")
-            .value_name("FILE"))
+        .arg(
+            Arg::with_name("config_file")
+                .short("c")
+                .long("config")
+                .help("Configuration file")
+                .value_name("FILE"),
+        )
         .get_matches();
     info!("PaMCollector {}", VERSION);
     let config_path = matches.value_of("config_file").unwrap_or(DEFAULT_CONF_FILE);

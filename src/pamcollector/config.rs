@@ -48,7 +48,7 @@ impl Config {
         Ok(config)
     }
 
-    pub fn get_tcp_input(&self) -> &str {
+    pub fn get_tcp_input(&self) -> &str  {
         match self.input {
             None => DEFAULT_TCP_LISTEN,
             Some(ref input) => {
